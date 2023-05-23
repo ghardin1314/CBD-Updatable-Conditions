@@ -45,6 +45,10 @@ Or we can allow for something similar to how this is making dynamic contract cal
 
 Will probably need some level of updates to the API to allow for dynamic conditions. Mostly just some additional `abi.encode` of parameters provided by the user before submitting to the blockchain for validation. Will experiment more when I have some time. Might wait until after the upcoming DKG api updates to see if there are any changes that need to be made.
 
+## Examples
+
+Check ./contracts/tests for some examples. Currently only checks `balanceOf` and `ownerOf` for ERC721 but I think this gives a good idea of how dynamic input and return data params can be used. 
+
 ## Features
 
 - [x] Create a new condition set (Strategy)
