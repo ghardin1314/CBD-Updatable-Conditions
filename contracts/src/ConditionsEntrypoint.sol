@@ -8,14 +8,6 @@ struct Strategy {
     uint256 conditionLength;
 }
 
-// struct Condition {
-//     address target;
-//     address callDataModifier;
-//     address returnValueModifier;
-//     bytes staticCallData;
-//     bytes staticReturnValue;
-// }
-
 struct StaticCondition {
     address target;
     bytes4 selector;
@@ -116,6 +108,8 @@ contract ConditionsEntrypoint {
 
         return true;
     }
+
+    // Validation Utils
 
     function eq(bytes memory a, bytes memory b) public pure returns (bool) {
         return keccak256(a) == keccak256(b);
