@@ -38,25 +38,31 @@ contract ERC721Conditions is Base {
             selector: selector,
             callDataModifier: address(erc721Mod),
             callDataModifierSelector: ERC721Modifier.balanceOf.selector,
+            returnValueModifier: address(0),
+            returnValueModifierSelector: bytes4(0),
             callData: callData,
             returnData: returnData
         });
-        bytes[] memory context = new bytes[](1);
-        context[0] = abi.encode(subject);
+
+        bytes[] memory inputContext = new bytes[](1);
+        inputContext[0] = abi.encode(subject);
+
+        bytes[] memory returnContext = new bytes[](1);
+        returnContext[0] = "";
 
         entrypoint.createStrategy(id, conditions);
-        assertFalse(entrypoint.verifyStrategy(id, context));
+        assertFalse(entrypoint.verifyStrategy(id, inputContext, returnContext));
 
         target.mint(subject, 1);
         target.mint(subject, 2);
-        assertTrue(entrypoint.verifyStrategy(id, context));
+        assertTrue(entrypoint.verifyStrategy(id, inputContext, returnContext));
     }
 
     function testOwnerOf() public {
         uint256 tokenId = 2;
         bytes4 selector = ERC721.ownerOf.selector;
         bytes memory callData = abi.encode(tokenId);
-        bytes memory returnData = abi.encode(subject);
+        bytes memory returnData = "";
 
         DynamicCondition[] memory conditions = new DynamicCondition[](1);
 
@@ -65,17 +71,22 @@ contract ERC721Conditions is Base {
             selector: selector,
             callDataModifier: address(0),
             callDataModifierSelector: bytes4(0),
+            returnValueModifier: address(erc721Mod),
+            returnValueModifierSelector: ERC721Modifier.ownerOf.selector,
             callData: callData,
             returnData: returnData
         });
 
-        bytes[] memory context = new bytes[](1);
-        context[0] = "";
+        bytes[] memory inputContext = new bytes[](1);
+        inputContext[0] = "";
+
+        bytes[] memory returnContext = new bytes[](1);
+        returnContext[0] = abi.encode(subject);
 
         entrypoint.createStrategy(id, conditions);
-        assertFalse(entrypoint.verifyStrategy(id, context));
+        assertFalse(entrypoint.verifyStrategy(id, inputContext, returnContext));
 
         target.mint(subject, 2);
-        assertTrue(entrypoint.verifyStrategy(id, context));
+        assertTrue(entrypoint.verifyStrategy(id, inputContext, returnContext));
     }
 }

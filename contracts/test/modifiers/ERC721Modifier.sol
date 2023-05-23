@@ -4,14 +4,15 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 
 contract ERC721Modifier {
-    function balanceOf(bytes memory staticCallData, bytes memory context) public pure returns (address) {		
-		(address owner) = abi.decode(context, (address));
+    function balanceOf(bytes memory staticCallData, bytes memory context) public pure returns (address) {
+        (address owner) = abi.decode(context, (address));
         return owner;
     }
 
-    // function ownerOf(uint256 tokenId) public pure returns (bytes memory) {
-    //     return abi.encodeWithSelector(ERC721.ownerOf.selector, tokenId);
-    // }
+    function ownerOf(bytes memory staticReturnData, bytes memory context) public pure returns (address) {
+        (address owner) = abi.decode(context, (address));
+        return owner;
+    }
 }
 
 /// @title ERC-721 Non-Fungible Token Standard

@@ -28,6 +28,8 @@ struct DynamicCondition {
     bytes4 selector;
     address callDataModifier;
     bytes4 callDataModifierSelector;
+    address returnValueModifier;
+    bytes4 returnValueModifierSelector;
     bytes callData;
     bytes returnData;
 }
@@ -50,7 +52,11 @@ contract ConditionsEntrypoint {
         }
     }
 
-    function verifyStrategy(bytes32 id, bytes[] calldata context) public view returns (bool) {
+    function verifyStrategy(bytes32 id, bytes[] calldata inputContext, bytes[] calldata returnContext)
+        public
+        view
+        returns (bool)
+    {
         Strategy memory strategy = _strategies[id];
 
         if (!strategy.initialized) {
@@ -60,11 +66,11 @@ contract ConditionsEntrypoint {
         for (uint256 i; i < strategy.conditionLength; i++) {
             DynamicCondition memory condition = _conditions[id][i];
 
+            // Dynamic Input Parameters based on context
             bytes memory callData = condition.callData;
             if (condition.callDataModifier != address(0)) {
-
                 (bool modSuccess, bytes memory modResult) = condition.callDataModifier.staticcall(
-                    abi.encodeWithSelector(condition.callDataModifierSelector, callData, context[i])
+                    abi.encodeWithSelector(condition.callDataModifierSelector, callData, inputContext[i])
                 );
 
                 // Probably revert here
@@ -75,13 +81,29 @@ contract ConditionsEntrypoint {
                 callData = modResult;
             }
 
+            // Dynamic Return Value based on context
+            bytes memory returnData = condition.returnData;
+            if (condition.returnValueModifier != address(0)) {
+                (bool modSuccess, bytes memory modResult) = condition.returnValueModifier.staticcall(
+                    abi.encodeWithSelector(condition.returnValueModifierSelector, returnData, returnContext[i])
+                );
+
+                // Probably revert here
+                if (!modSuccess) {
+                    return false;
+                }
+
+                returnData = modResult;
+            }
+
             (bool success, bytes memory result) =
                 condition.target.staticcall(bytes.concat(condition.selector, callData));
 
             if (!success) {
                 return false;
             }
-            if (keccak256(result) != keccak256(condition.returnData)) {
+
+            if (keccak256(result) != keccak256(returnData)) {
                 return false;
             }
         }
