@@ -30,6 +30,8 @@ struct DynamicCondition {
     bytes4 callDataModifierSelector;
     address returnValueModifier;
     bytes4 returnValueModifierSelector;
+    address validationTarget;
+    bytes4 validationSelector;
     bytes callData;
     bytes returnData;
 }
@@ -103,11 +105,59 @@ contract ConditionsEntrypoint {
                 return false;
             }
 
-            if (keccak256(result) != keccak256(returnData)) {
+            (bool validationSuccess, bytes memory validationResult) = condition.validationTarget.staticcall(
+                abi.encodeWithSelector(condition.validationSelector, result, returnData)
+            );
+
+            if (!validationSuccess || !abi.decode(validationResult, (bool))) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    function eq(bytes memory a, bytes memory b) public pure returns (bool) {
+        return keccak256(a) == keccak256(b);
+    }
+
+    /**
+     * @dev assumes that the length of the bytes is 32 or less
+     */
+    function gt(bytes memory a, bytes memory b) public pure returns (bool) {
+        (uint256 valA) = abi.decode(a, (uint256));
+        (uint256 valB) = abi.decode(b, (uint256));
+
+        return valA > valB;
+    }
+
+    /**
+     * @dev assumes that the length of the bytes is 32 or less
+     */
+    function gte(bytes memory a, bytes memory b) public pure returns (bool) {
+        (uint256 valA) = abi.decode(a, (uint256));
+        (uint256 valB) = abi.decode(b, (uint256));
+
+        return valA >= valB;
+    }
+
+    /**
+     * @dev assumes that the length of the bytes is 32 or less
+     */
+    function lt(bytes memory a, bytes memory b) public pure returns (bool) {
+        (uint256 valA) = abi.decode(a, (uint256));
+        (uint256 valB) = abi.decode(b, (uint256));
+
+        return valA < valB;
+    }
+
+    /**
+     * @dev assumes that the length of the bytes is 32 or less
+     */
+    function lte(bytes memory a, bytes memory b) public pure returns (bool) {
+        (uint256 valA) = abi.decode(a, (uint256));
+        (uint256 valB) = abi.decode(b, (uint256));
+
+        return valA <= valB;
     }
 }

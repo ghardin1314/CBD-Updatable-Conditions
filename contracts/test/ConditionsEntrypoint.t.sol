@@ -30,7 +30,7 @@ contract ERC721Conditions is Base {
     function testBalanceOf() public {
         bytes4 selector = ERC721.balanceOf.selector;
         bytes memory callData = "";
-        bytes memory returnData = abi.encode(2);
+        bytes memory returnData = abi.encode(1);
 
         DynamicCondition[] memory conditions = new DynamicCondition[](1);
         conditions[0] = DynamicCondition({
@@ -40,6 +40,8 @@ contract ERC721Conditions is Base {
             callDataModifierSelector: ERC721Modifier.balanceOf.selector,
             returnValueModifier: address(0),
             returnValueModifierSelector: bytes4(0),
+            validationTarget: address(entrypoint),
+            validationSelector: entrypoint.gt.selector,
             callData: callData,
             returnData: returnData
         });
@@ -73,6 +75,8 @@ contract ERC721Conditions is Base {
             callDataModifierSelector: bytes4(0),
             returnValueModifier: address(erc721Mod),
             returnValueModifierSelector: ERC721Modifier.ownerOf.selector,
+            validationTarget: address(entrypoint),
+            validationSelector: entrypoint.eq.selector,
             callData: callData,
             returnData: returnData
         });
