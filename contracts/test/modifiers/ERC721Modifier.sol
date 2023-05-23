@@ -1,14 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
+import "forge-std/Test.sol";
+
 contract ERC721Modifier {
-    function balanceOf(address owner) public pure returns (bytes memory) {
-        return abi.encodeWithSelector(ERC721.balanceOf.selector, owner);
+    function balanceOf(bytes memory staticCallData, bytes memory context) public pure returns (address) {		
+		(address owner) = abi.decode(context, (address));
+        return owner;
     }
 
-    function ownerOf(uint256 tokenId) public pure returns (bytes memory) {
-        return abi.encodeWithSelector(ERC721.ownerOf.selector, tokenId);
-    }
+    // function ownerOf(uint256 tokenId) public pure returns (bytes memory) {
+    //     return abi.encodeWithSelector(ERC721.ownerOf.selector, tokenId);
+    // }
 }
 
 /// @title ERC-721 Non-Fungible Token Standard
