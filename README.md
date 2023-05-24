@@ -55,7 +55,7 @@ Check ./contracts/tests for some examples. Currently only checks `balanceOf` and
 - [x] Allow for validation time input parameters
 - [x] Allow for validation time return parameters
 - [x] Allow for dynamic validation functions
-- [] Allow for updating conditions
-- [] Updating conditions access controls
-- [] `OR` condition combinations (currently only AND)
-- [] optimize storage/encoding scheme
+- [ ] Allow for updating conditions
+- [ ] Updating conditions access controls
+- [ ] `OR` condition combinations (currently only AND)
+- [ ] optimize storage/encoding scheme
